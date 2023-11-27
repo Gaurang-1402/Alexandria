@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c8125197579a3459ea555cb139f6d27c
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 134213
+  packageName: EndlessBook
+  packageVersion: 1.13.1
+  assetPath: Assets/EndlessBook/EndlessBookAssembly.asmdef
+  uploadId: 609218
