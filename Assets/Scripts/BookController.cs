@@ -9,56 +9,27 @@ using TMPro; // Include the TextMeshPro namespace if you're using TextMeshPro
 public class BookController : MonoBehaviour
 {
     public EndlessBook book;
-    public Camera renderCamera; // Assign the camera that will render the page
-    public TextMeshProUGUI textTemplate; // Assign a TextMeshProUGUI template
-    public RenderTexture pageRenderTexture; // Assign a RenderTexture with the size matching the book page
 
-    void Start()
+    public PageRenderer pageRenderer; // Reference to the PageRenderer component
+                                       // Call this to add new pages to the book
+    public void AddNewPages(string leftPageText, string rightPageText)
     {
-        // Read the ePub book
-        EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/sapiens.epub");
+        // Render the pages and get the materials
+        Material leftPageMaterial = pageRenderer.RenderLeftPageToMaterial(leftPageText);
+        Material rightPageMaterial = pageRenderer.RenderRightPageToMaterial(rightPageText);
 
-        // Extract the text for the first page or any specific section
-        string pageText = "An Animal of No Significance\n\nABOUT 13.5 BILLION YEARS AGO, MATTER, energy, ..."; // Shortened for brevity
+        // Add the materials to the book
+        book.AddPageData(leftPageMaterial);
+        book.AddPageData(rightPageMaterial);
 
-        // Set the text to the TextMeshPro template
-        textTemplate.text = pageText;
-
-        // Render the text to the RenderTexture
-        RenderTextToTexture(pageText);
-
-        // Create a new material with the RenderTexture
-        Material pageMaterial = new Material(Shader.Find("Unlit/Texture"));
-        pageMaterial.mainTexture = pageRenderTexture;
-
-        // Add the page material to the book
-        book.AddPageData(pageMaterial);
-    }
-
-    void RenderTextToTexture(string text)
-    {
-        // Ensure the text template is active
-        textTemplate.gameObject.SetActive(true);
-
-        // Set the text you want to render
-        textTemplate.text = text;
-
-        // Set the camera's target texture to the render texture
-        renderCamera.targetTexture = pageRenderTexture;
-
-        // Render the camera's view (which includes the TextMeshPro text) to the texture
-        renderCamera.Render();
-
-        // Deactivate the text template if it should not stay visible
-        textTemplate.gameObject.SetActive(false);
+        // Update the character index for next pages
     }
 
     void Update()
     {
-
+        // Space key to toggle book open/close
         if (Input.GetKeyDown(KeyCode.Space))
         {
-
             if (book.CurrentState == EndlessBook.StateEnum.ClosedFront)
             {
                 book.SetState(EndlessBook.StateEnum.OpenMiddle);
@@ -67,13 +38,38 @@ public class BookController : MonoBehaviour
             {
                 book.SetState(EndlessBook.StateEnum.ClosedFront);
             }
-       } else if (Input.GetKeyDown(KeyCode.LeftArrow) && !book.IsFirstPageGroup) {
-            // book.SetPageNumber(book.CurrentLeftPageNumber - 2);
+        }
+        // Left arrow key to turn pages back
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) && !book.IsFirstPageGroup)
+        {
             book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
-       } else if (Input.GetKeyDown(KeyCode.RightArrow) && !book.IsLastPageGroup) {
-            // book.SetPageNumber(book.CurrentLeftPageNumber + 2);
-            book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
-       }
-        
+        }
+        // Right arrow key to turn pages forward and add new pages if necessary
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            if (!book.IsLastPageGroup)
+            {
+                book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
+            }
+            else
+            {
+                // Assume GetNextPageText will handle updating the charIndex and determining if there is more text to add
+                string leftPageText = GetNextPageText(); // Implement this method to fetch the text for the left page
+                string rightPageText = GetNextPageText(); // Implement this method to fetch the text for the right page
+
+                // Check if there is new text to add before adding the pages
+                if (!string.IsNullOrEmpty(leftPageText) || !string.IsNullOrEmpty(rightPageText))
+                {
+                    AddNewPages(leftPageText, rightPageText);
+                }
+            }
+        }
+    }
+
+    private string GetNextPageText()
+    {
+        // Your method to fetch the next chunk of text based on charIndex
+        // Update this method to retrieve text appropriately
+        return "Sample text for one page.";
     }
 }
