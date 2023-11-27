@@ -44,27 +44,33 @@ public class BookController : MonoBehaviour
         {
             book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
         }
-        // Right arrow key to turn pages forward and add new pages if necessary
+        // Right arrow key to turn pages forward
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            if (!book.IsLastPageGroup)
+            // Check if we are at the last page and need to add new ones
+            if (book.IsLastPageGroup)
             {
-                book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
-            }
-            else
-            {
-                // Assume GetNextPageText will handle updating the charIndex and determining if there is more text to add
-                string leftPageText = GetNextPageText(); // Implement this method to fetch the text for the left page
-                string rightPageText = GetNextPageText(); // Implement this method to fetch the text for the right page
+                // Get the next chunks of text from your text file
+                string leftPageText = GetNextPageText(); // Get text for the left page
+                string rightPageText = GetNextPageText(); // Get text for the right page
 
-                // Check if there is new text to add before adding the pages
+                // Only add new pages if there's text to add
                 if (!string.IsNullOrEmpty(leftPageText) || !string.IsNullOrEmpty(rightPageText))
                 {
                     AddNewPages(leftPageText, rightPageText);
+
+                    // Since we're at the last page, we need to manually turn to the new pages
+                    book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
                 }
+            }
+            else
+            {
+                // If we're not at the last page group, just turn the page as usual
+                book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
             }
         }
     }
+
 
     private string GetNextPageText()
     {
