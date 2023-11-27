@@ -1,81 +1,91 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using echo17.EndlessBook;
 using VersOne.Epub;
+using System.Text;
+using HtmlAgilityPack;
+using System.IO;
 using TMPro; // Include the TextMeshPro namespace if you're using TextMeshPro
+using echo17.EndlessBook; // Include the EndlessBook namespace
 
 public class BookController : MonoBehaviour
 {
     public EndlessBook book;
-
     public PageRenderer pageRenderer; // Reference to the PageRenderer component
-                                       // Call this to add new pages to the book
-    public void AddNewPages(string leftPageText, string rightPageText)
+    private int charIndex = 0; // Character index to keep track of text position
+    private string fullBookContent; // Holds the entire text content of the book
+
+    void Start()
     {
-        // Render the pages and get the materials
-        Material leftPageMaterial = pageRenderer.RenderLeftPageToMaterial(leftPageText);
-        Material rightPageMaterial = pageRenderer.RenderRightPageToMaterial(rightPageText);
+        // Read and parse the EPUB file
+        EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/sapiens.epub");
+        fullBookContent = ExtractContent(epubBook);
 
-        // Add the materials to the book
-        book.AddPageData(leftPageMaterial);
-        book.AddPageData(rightPageMaterial);
-
-        // Update the character index for next pages
+        // Initialize the book with the first pages
+        string leftPageText = GetNextPageText();
+        string rightPageText = GetNextPageText();
+        AddNewPages(leftPageText, rightPageText);
     }
 
     void Update()
     {
-        // Space key to toggle book open/close
-        if (Input.GetKeyDown(KeyCode.Space))
+        // User input handling for page turning
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            if (book.CurrentState == EndlessBook.StateEnum.ClosedFront)
-            {
-                book.SetState(EndlessBook.StateEnum.OpenMiddle);
-            }
-            else
-            {
-                book.SetState(EndlessBook.StateEnum.ClosedFront);
-            }
-        }
-        // Left arrow key to turn pages back
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) && !book.IsFirstPageGroup)
-        {
-            book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
-        }
-        // Right arrow key to turn pages forward
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            // Check if we are at the last page and need to add new ones
+            // Fetch and add new pages if at the last page group
             if (book.IsLastPageGroup)
             {
-                // Get the next chunks of text from your text file
-                string leftPageText = GetNextPageText(); // Get text for the left page
-                string rightPageText = GetNextPageText(); // Get text for the right page
-
-                // Only add new pages if there's text to add
+                string leftPageText = GetNextPageText();
+                string rightPageText = GetNextPageText();
                 if (!string.IsNullOrEmpty(leftPageText) || !string.IsNullOrEmpty(rightPageText))
                 {
                     AddNewPages(leftPageText, rightPageText);
-
-                    // Since we're at the last page, we need to manually turn to the new pages
-                    book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
                 }
             }
-            else
-            {
-                // If we're not at the last page group, just turn the page as usual
-                book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
-            }
+            // Turn to the next page group
+            book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 1f);
         }
     }
 
+    private void AddNewPages(string leftPageText, string rightPageText)
+    {
+        Material leftPageMaterial = pageRenderer.RenderLeftPageToMaterial(leftPageText);
+        Material rightPageMaterial = pageRenderer.RenderRightPageToMaterial(rightPageText);
+        book.AddPageData(leftPageMaterial);
+        book.AddPageData(rightPageMaterial);
+    }
 
     private string GetNextPageText()
     {
-        // Your method to fetch the next chunk of text based on charIndex
-        // Update this method to retrieve text appropriately
-        return "Sample text for one page.";
+        if (charIndex + 100 > fullBookContent.Length)
+            return null; // No more text to add
+
+        string nextPageText = fullBookContent.Substring(charIndex, 100);
+        charIndex += 100;
+        return nextPageText;
+    }
+
+    private string ExtractContent(EpubBook epubBook)
+    {
+        // Extract text from all reading order items and concatenate
+        StringBuilder fullContent = new StringBuilder();
+        foreach (EpubLocalTextContentFile textContentFile in epubBook.ReadingOrder)
+        {
+            string content = ExtractPlainText(textContentFile);
+            fullContent.Append(content);
+        }
+        return fullContent.ToString();
+    }
+
+    private string ExtractPlainText(EpubLocalTextContentFile textContentFile)
+    {
+        HtmlDocument htmlDocument = new HtmlDocument();
+        htmlDocument.LoadHtml(textContentFile.Content);
+        StringBuilder sb = new StringBuilder();
+        foreach (HtmlNode node in htmlDocument.DocumentNode.SelectNodes("//text()"))
+        {
+            sb.AppendLine(node.InnerText.Trim());
+        }
+        return sb.ToString();
     }
 }
