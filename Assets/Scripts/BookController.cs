@@ -59,10 +59,10 @@ public class BookController : MonoBehaviour
 
     private string GetNextPageText()
     {
-        const int charsPerLine = 45; // Set the fixed number of characters per line
-        const int maxLinesPerPage = 17; // Set the maximum number of lines per page
+        const int charsPerLine = 38; // Set the fixed number of characters per line
+        const int maxLinesPerPage = 16; // Set the maximum number of lines per page
         const int charsPerPage = charsPerLine * maxLinesPerPage; // Calculate total characters per page
-        const int paragraphBreakFrequency = 7; // Approximate number of lines after which to insert a paragraph break
+        const int paragraphBreakFrequency = 6; // Approximate number of lines after which to insert a paragraph break
 
         if (charIndex + charsPerPage > fullBookContent.Length)
             return null; // No more text to add
