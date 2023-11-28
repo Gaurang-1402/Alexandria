@@ -16,6 +16,8 @@ public class BookController : MonoBehaviour
     public PageRenderer pageRenderer; // Reference to the PageRenderer component
     private int charIndex = 0; // Character index to keep track of text position
     private string fullBookContent; // Holds the entire text content of the book
+    private List<int> pageStartIndices = new List<int>(); // Stores the start index of each page
+
 
     void Start()
     {
@@ -47,6 +49,16 @@ public class BookController : MonoBehaviour
             // Turn to the next page group
             book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.3f);
         }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (book.CurrentLeftPageNumber > 0)
+            {
+                // Go back one page
+                book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.3f);
+
+
+            }
+        }
     }
 
     private void AddNewPages(string leftPageText, string rightPageText)
@@ -67,6 +79,9 @@ public class BookController : MonoBehaviour
         if (charIndex + charsPerPage > fullBookContent.Length)
             return null; // No more text to add
 
+        // Store the start index of the current page
+        pageStartIndices.Add(charIndex);
+
         string pageText = fullBookContent.Substring(charIndex, Mathf.Min(charsPerPage, fullBookContent.Length - charIndex));
         StringBuilder pageBuilder = new StringBuilder();
         int lineCounter = 0;
@@ -74,28 +89,75 @@ public class BookController : MonoBehaviour
         // Loop through pageText in chunks of charsPerLine
         for (int i = 0; i < pageText.Length; i += charsPerLine)
         {
-            // Determine the length of the substring (avoid substring out of range error)
             int length = charsPerLine;
             if (i + length > pageText.Length) length = pageText.Length - i;
 
-            // Append the substring to the pageBuilder
             pageBuilder.AppendLine(pageText.Substring(i, length));
             lineCounter++;
 
-            // Randomly decide if a paragraph break should be added
-            if (lineCounter >= paragraphBreakFrequency && Random.Range(0, 2) > 0) // 50% chance to add a paragraph break
+            if (lineCounter >= paragraphBreakFrequency && Random.Range(0, 2) > 0)
             {
-                pageBuilder.AppendLine("\n"); // Add an extra line to create a paragraph break
-                lineCounter = 0; // Reset line counter after a paragraph break
+                pageBuilder.AppendLine("\n");
+                lineCounter = 0;
             }
         }
 
         // Update charIndex to the next set of characters
         charIndex += pageText.Length;
+
         return pageBuilder.ToString().TrimEnd(new char[] { ' ', '\n' }); // Trim any trailing whitespace or newlines
     }
 
 
+    private string GetPrevPageText()
+    {
+        const int charsPerLine = 38; // Set the fixed number of characters per line
+        const int maxLinesPerPage = 16; // Set the maximum number of lines per page
+        const int charsPerPage = charsPerLine * maxLinesPerPage; // Calculate total characters per page
+
+        if (pageStartIndices.Count <= 1) // Can't go back from the first page
+            return null;
+
+        // Calculate start index for the previous page
+        int prevPageIndex = pageStartIndices[pageStartIndices.Count - 2];
+        string prevPageText = fullBookContent.Substring(prevPageIndex, Mathf.Min(charsPerPage, charIndex - prevPageIndex));
+
+        // Adjust the charIndex to the start of the previous page
+        charIndex = prevPageIndex;
+
+        // Remove the indices for the current page and the previous page
+        pageStartIndices.RemoveAt(pageStartIndices.Count - 1);
+        pageStartIndices.RemoveAt(pageStartIndices.Count - 1);
+
+        return FormatPageText(prevPageText);
+    }
+
+    private string FormatPageText(string pageText)
+    {
+        const int charsPerLine = 38; // Fixed number of characters per line
+        const int paragraphBreakFrequency = 6; // Lines after which to insert a paragraph break
+
+        StringBuilder pageBuilder = new StringBuilder();
+        int lineCounter = 0;
+
+        // Loop through pageText in chunks of charsPerLine
+        for (int i = 0; i < pageText.Length; i += charsPerLine)
+        {
+            int length = charsPerLine;
+            if (i + length > pageText.Length) length = pageText.Length - i;
+
+            pageBuilder.AppendLine(pageText.Substring(i, length));
+            lineCounter++;
+
+            if (lineCounter >= paragraphBreakFrequency && Random.Range(0, 2) > 0)
+            {
+                pageBuilder.AppendLine("\n");
+                lineCounter = 0;
+            }
+        }
+
+        return pageBuilder.ToString().TrimEnd(new char[] { ' ', '\n' }); // Trim trailing whitespace or newlines
+    }
 
 
     private string ExtractContent(EpubBook epubBook)
