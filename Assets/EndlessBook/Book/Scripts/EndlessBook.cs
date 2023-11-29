@@ -41,6 +41,8 @@
     /// <param name="rightPageNumber">The right page number after the turn</param>
 	public delegate void TurnPageDragCompleted(int leftPageNumber, int rightPageNumber);
 
+
+
     /// <summary>
     /// This class handles state changes and turning of the pages, setting the appropriate materials.
     /// </summary>
@@ -1705,6 +1707,38 @@
                 SetPageNumber(currentPageNumber);
             }
         }
+
+        /// <summary>
+        /// Updates the material of a specific page.
+        /// </summary>
+        /// <param name="pageNumber">The page number to update</param>
+        /// <param name="newMaterial">The new material for the page</param>
+        public virtual void UpdatePageDataMaterial(int pageNumber, Material newMaterial)
+        {
+            // Check if it is a valid page number
+            if (pageNumber < 1 || pageNumber > pageData.Count)
+            {
+                LogInvalidPageNumber();
+                return;
+            }
+
+            // Get the existing PageData for the specified page
+            var existingPageData = pageData[pageNumber - 1];
+
+            // Update the material
+            existingPageData.material = newMaterial;
+
+            // Update the page data in the list
+            pageData[pageNumber - 1] = existingPageData;
+
+            // If the page is currently being displayed, update the book's materials
+            if (IsInCurrentPageGroup(pageNumber))
+            {
+                SetPageNumber(currentPageNumber);
+            }
+        }
+
+
 
         /// <summary>
         /// Removes page data at a given page number
