@@ -52,7 +52,6 @@ public class BookController : MonoBehaviour
         pageTurnSound.playOnAwake = false; // So it doesn't play immediately
 
 
-
         // Read and parse the EPUB file
         EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/sapiens.epub");
         fullBookContent = ExtractContent(epubBook);
@@ -61,25 +60,44 @@ public class BookController : MonoBehaviour
 
     void Update()
 
-        // TODO: put conditional for first page for flipping book cover
     {
         // Handle right arrow key press for turning pages forward
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             Debug.Log("Turn right");
-            TurnPageRight();
+
+            // Check if the book is closed
+            if (book.CurrentState == EndlessBook.StateEnum.ClosedFront)
+            {
+                // Open the book and add the first set of pages
+                OpenBookAndAddFirstPages();
+            }
+            else
+            {
+                // Otherwise, turn the page right
+                TurnPageRight();
+            }
         }
 
         // Handle left arrow key press for turning pages backward
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             Debug.Log("Turn left");
-
             TurnPageLeft();
         }
     }
 
+    private void OpenBookAndAddFirstPages()
+    {
+        // Open the book
+        book.SetState(EndlessBook.StateEnum.OpenMiddle, openCloseTime, OnBookStateChanged);
+        bookOpenSound.Play();
 
+        // currentLeftPageIndex += 2;
+
+        // Add the first set of pages
+        AddNewPage();
+    }
 
     private void TurnPageRight()
     {
@@ -165,6 +183,7 @@ public class BookController : MonoBehaviour
             // Add the rendered page materials to the book
             book.AddPageData(leftPageMaterial);
             book.AddPageData(rightPageMaterial);
+
         }
     }
 
