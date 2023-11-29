@@ -5,7 +5,7 @@ using VersOne.Epub;
 using System.Text;
 using HtmlAgilityPack;
 using System.IO;
-using TMPro; // Include the TextMeshPro namespace if you're using TextMeshPro
+using TMPro; 
 using echo17.EndlessBook; // Include the EndlessBook namespace
 using System.Text.RegularExpressions;
 
@@ -16,10 +16,43 @@ public class BookController : MonoBehaviour
     private int charIndex = 0; // Character index to keep track of text position
     private string fullBookContent; // Holds the entire text content of the book
     private List<int> pageStartIndices = new List<int>(); // Stores the start index of each page
-    private int currentPageIndex = 0; // Tracks the current page index
+    private int currentLeftPageIndex = 0; // Tracks the current page index
+                                      // Duration of the open/close animation
+    public float openCloseTime = 1.0f; // 1 second for the animation
 
+
+    // References to audio clips
+    public AudioClip bookOpenClip;
+    public AudioClip bookCloseClip;
+    public AudioClip pageTurnClip;
+
+    // AudioSource components that will play the audio clips
+    private AudioSource bookOpenSound;
+    private AudioSource bookCloseSound;
+    private AudioSource pageTurnSound;
     void Start()
     {
+        // Assuming the audio clips are located in a folder named "Sounds" within the Resources folder
+        bookOpenClip = Resources.Load<AudioClip>("Sounds/BookOpen");
+        bookCloseClip = Resources.Load<AudioClip>("Sounds/BookClose");
+        pageTurnClip = Resources.Load<AudioClip>("Sounds/PageTurn");
+
+
+        // Create and assign AudioSource components, set clip, and other properties
+        bookOpenSound = gameObject.AddComponent<AudioSource>();
+        bookOpenSound.clip = bookOpenClip;
+        bookOpenSound.playOnAwake = false; // So it doesn't play immediately
+
+        bookCloseSound = gameObject.AddComponent<AudioSource>();
+        bookCloseSound.clip = bookCloseClip;
+        bookCloseSound.playOnAwake = false; // So it doesn't play immediately
+
+        pageTurnSound = gameObject.AddComponent<AudioSource>();
+        pageTurnSound.clip = pageTurnClip;
+        pageTurnSound.playOnAwake = false; // So it doesn't play immediately
+
+
+
         // Read and parse the EPUB file
         EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/sapiens.epub");
         fullBookContent = ExtractContent(epubBook);
@@ -46,52 +79,77 @@ public class BookController : MonoBehaviour
         }
     }
 
+
+
     private void TurnPageRight()
-
-
     {
-        if (currentPageIndex < pageStartIndices.Count - 1)
+        if (currentLeftPageIndex < pageStartIndices.Count - 1)
         {
-            currentPageIndex++;
-            currentPageIndex++;
-            Debug.Log("After page turn " + currentPageIndex);
+            currentLeftPageIndex += 2;
+            Debug.Log("After page turn " + currentLeftPageIndex);
 
             UpdatePageMaterials();
-            book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.3f);
+            pageTurnSound.Play();
 
+            book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.5f);
         }
         else if (IsAtLastPage())
         {
-            Debug.Log("Last page");
+            if (charIndex >= fullBookContent.Length)
+            {
+                // Close the book because we reached the end of the content
+                bookCloseSound.Play();
+                book.SetState(EndlessBook.StateEnum.ClosedFront, openCloseTime, (fromState, toState, pageNumber) => OnBookStateChanged(fromState, toState, pageNumber));
+            }
+            else
+            {
+                Debug.Log("Last page but not end of content, add new page");
 
-            currentPageIndex++;
-            currentPageIndex++;
-            Debug.Log("After page turn " + currentPageIndex);
+                currentLeftPageIndex += 2;
+                Debug.Log("After page turn " + currentLeftPageIndex);
 
-            AddNewPage();
-            book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.3f);
-
+                AddNewPage();
+                pageTurnSound.Play();
+                book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.5f);
+            }
         }
+    }
+
+
+
+    // Method to handle book state changes
+    private void OnBookStateChanged(EndlessBook.StateEnum fromState, EndlessBook.StateEnum toState, int pageNumber)
+    {
+        // Here you can handle what happens when the book state changes
+        // For example, play a sound or update the UI
+        Debug.Log("Book state changed from " + fromState + " to " + toState);
     }
 
     private void TurnPageLeft()
     {
-        if (currentPageIndex > 0)
+        if (currentLeftPageIndex > 0)
         {
-            currentPageIndex--;
-            currentPageIndex--;
+            currentLeftPageIndex -= 2;
             UpdatePageMaterials();
-
-            Debug.Log("After page turn " + currentPageIndex);
-
+            Debug.Log("After page turn " + currentLeftPageIndex);
             book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.3f);
-
+            pageTurnSound.Play();
+        }
+        else
+        {
+            // If we're at the first page, close the book
+            if (book.CurrentState != EndlessBook.StateEnum.ClosedFront)
+            {
+                book.SetState(EndlessBook.StateEnum.ClosedFront, openCloseTime, OnBookStateChanged);
+                bookCloseSound.Play();
+            }
         }
     }
 
+
+
     private void AddNewPage()
     {
-        // HANDLES UPDATE PAGE MATERIAL ALSO
 
         // Get text for the next left and right pages
         string leftPageText = GetNextPageText();
@@ -113,8 +171,8 @@ public class BookController : MonoBehaviour
     private void UpdatePageMaterials()
     {
         // Get the text for the current left and right pages
-        string leftPageText = RenderPageBasedOnIndex(currentPageIndex - 2);
-        string rightPageText = RenderPageBasedOnIndex(currentPageIndex - 1);
+        string leftPageText = RenderPageBasedOnIndex(currentLeftPageIndex - 2);
+        string rightPageText = RenderPageBasedOnIndex(currentLeftPageIndex - 1);
 
         // Render the text onto materials using the PageRenderer
         Material leftPageMaterial = pageRenderer.RenderLeftPageToMaterial(leftPageText);
@@ -128,6 +186,7 @@ public class BookController : MonoBehaviour
 
     private bool IsAtLastPage()
     {
+
         // Check if the current page is the last in the book
         return book.CurrentRightPageNumber >= book.LastPageNumber;
     }
