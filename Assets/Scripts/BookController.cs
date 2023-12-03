@@ -1,11 +1,11 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VersOne.Epub;
 using System.Text;
 using HtmlAgilityPack;
 using System.IO;
-using TMPro; 
+using TMPro;
 using echo17.EndlessBook; // Include the EndlessBook namespace
 using System.Text.RegularExpressions;
 
@@ -16,8 +16,6 @@ public class BookController : MonoBehaviour
     private int charIndex = 0; // Character index to keep track of text position
     private string fullBookContent; // Holds the entire text content of the book
     private List<int> pageStartIndices = new List<int>(); // Stores the start index of each page
-    private int currentLeftPageIndex = 0; // Tracks the current page index
-                                      // Duration of the open/close animation
     public float openCloseTime = 1.0f; // 1 second for the animation
 
 
@@ -56,6 +54,8 @@ public class BookController : MonoBehaviour
         EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/sapiens.epub");
         fullBookContent = ExtractContent(epubBook);
 
+        Debug.Log("Left page number " + book.CurrentLeftPageNumber);
+
     }
 
     void Update()
@@ -69,6 +69,7 @@ public class BookController : MonoBehaviour
             // Check if the book is closed
             if (book.CurrentState == EndlessBook.StateEnum.ClosedFront)
             {
+                Debug.Log("Book is closed now opening");
                 // Open the book and add the first set of pages
                 OpenBookAndAddFirstPages();
             }
@@ -90,26 +91,33 @@ public class BookController : MonoBehaviour
     private void OpenBookAndAddFirstPages()
     {
         // Open the book
-        book.SetState(EndlessBook.StateEnum.OpenMiddle, openCloseTime, OnBookStateChanged);
+        book.SetState(EndlessBook.StateEnum.OpenFront, openCloseTime, OnBookStateChanged);
         bookOpenSound.Play();
 
-        // currentLeftPageIndex += 2;
+        Debug.Log("After open " + book.CurrentLeftPageNumber);
+
+
+        // TODO: COULD BE A SOURCE OF BUG
+        // Align PageStartIndices with the current page number
+        pageStartIndices.Add(0);
 
         // Add the first set of pages
-        AddNewPage();
+        // AddNewPage();
     }
 
     private void TurnPageRight()
     {
-        if (currentLeftPageIndex < pageStartIndices.Count - 1)
+        if (book.CurrentLeftPageNumber < pageStartIndices.Count - 1)
         {
-            currentLeftPageIndex += 2;
-            Debug.Log("After page turn " + currentLeftPageIndex);
+
+            // middle case
 
             UpdatePageMaterials();
             pageTurnSound.Play();
 
             book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.5f);
+            Debug.Log("After page turn " + book.CurrentLeftPageNumber);
+
         }
         else if (IsAtLastPage())
         {
@@ -123,12 +131,11 @@ public class BookController : MonoBehaviour
             {
                 Debug.Log("Last page but not end of content, add new page");
 
-                currentLeftPageIndex += 2;
-                Debug.Log("After page turn " + currentLeftPageIndex);
-
                 AddNewPage();
                 pageTurnSound.Play();
                 book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.5f);
+                Debug.Log("After page turn " + book.CurrentLeftPageNumber);
+
             }
         }
     }
@@ -145,12 +152,12 @@ public class BookController : MonoBehaviour
 
     private void TurnPageLeft()
     {
-        if (currentLeftPageIndex > 0)
+
+        if (book.CurrentLeftPageNumber > 1)
         {
-            currentLeftPageIndex -= 2;
             UpdatePageMaterials();
-            Debug.Log("After page turn " + currentLeftPageIndex);
-            book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.3f);
+            book.TurnToPage(book.CurrentLeftPageNumber - 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.5f);
+            Debug.Log("After page turn " + book.CurrentLeftPageNumber);
             pageTurnSound.Play();
         }
         else
@@ -190,8 +197,8 @@ public class BookController : MonoBehaviour
     private void UpdatePageMaterials()
     {
         // Get the text for the current left and right pages
-        string leftPageText = RenderPageBasedOnIndex(currentLeftPageIndex - 2);
-        string rightPageText = RenderPageBasedOnIndex(currentLeftPageIndex - 1);
+        string leftPageText = RenderPageBasedOnIndex(book.CurrentLeftPageNumber);
+        string rightPageText = RenderPageBasedOnIndex(book.CurrentLeftPageNumber);
 
         // Render the text onto materials using the PageRenderer
         Material leftPageMaterial = pageRenderer.RenderLeftPageToMaterial(leftPageText);
@@ -253,7 +260,7 @@ public class BookController : MonoBehaviour
     }
 
 
-    
+
     private string GetNextPageText()
     {
         const int charsPerLine = 38; // Set the fixed number of characters per line
@@ -293,21 +300,21 @@ public class BookController : MonoBehaviour
         return pageBuilder.ToString().TrimEnd(new char[] { ' ', '\n' }); // Trim any trailing whitespace or newlines
     }
 
- 
+
 
     private string ExtractContent(EpubBook epubBook)
-{
-    // Extract text from all reading order items and concatenate
-    StringBuilder fullContent = new StringBuilder();
-    foreach (EpubLocalTextContentFile textContentFile in epubBook.ReadingOrder)
     {
-        string content = ExtractPlainText(textContentFile);
-        // Remove all newlines and extra spaces
-        string normalizedContent = Regex.Replace(content, @"\s+", " ");
-        fullContent.Append(normalizedContent);
+        // Extract text from all reading order items and concatenate
+        StringBuilder fullContent = new StringBuilder();
+        foreach (EpubLocalTextContentFile textContentFile in epubBook.ReadingOrder)
+        {
+            string content = ExtractPlainText(textContentFile);
+            // Remove all newlines and extra spaces
+            string normalizedContent = Regex.Replace(content, @"\s+", " ");
+            fullContent.Append(normalizedContent);
+        }
+        return fullContent.ToString();
     }
-    return fullContent.ToString();
-}
 
     private string ExtractPlainText(EpubLocalTextContentFile textContentFile)
     {
