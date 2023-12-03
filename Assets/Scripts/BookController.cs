@@ -1,11 +1,11 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VersOne.Epub;
 using System.Text;
 using HtmlAgilityPack;
 using System.IO;
-using TMPro; 
+using TMPro;
 using echo17.EndlessBook; // Include the EndlessBook namespace
 using System.Text.RegularExpressions;
 
@@ -17,7 +17,7 @@ public class BookController : MonoBehaviour
     private string fullBookContent; // Holds the entire text content of the book
     private List<int> pageStartIndices = new List<int>(); // Stores the start index of each page
     private int currentLeftPageIndex = 0; // Tracks the current page index
-                                      // Duration of the open/close animation
+                                          // Duration of the open/close animation
     public float openCloseTime = 1.0f; // 1 second for the animation
 
 
@@ -53,7 +53,7 @@ public class BookController : MonoBehaviour
 
 
         // Read and parse the EPUB file
-        EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/sapiens.epub");
+        EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/test.epub");
         fullBookContent = ExtractContent(epubBook);
 
     }
@@ -95,9 +95,33 @@ public class BookController : MonoBehaviour
 
         // currentLeftPageIndex += 2;
 
-        // Add the first set of pages
-        AddNewPage();
+        if (pageStartIndices.Count == 0)
+        {
+            // Add the first set of pages
+            AddNewPage();
+        }
+        else
+        {
+            string leftPageText = RenderPageBasedOnIndex(currentLeftPageIndex);
+            string rightPageText = RenderPageBasedOnIndex(currentLeftPageIndex + 1);
+
+            // Render the text onto materials using the PageRenderer
+            Material leftPageMaterial = pageRenderer.RenderLeftPageToMaterial(leftPageText);
+            Material rightPageMaterial = pageRenderer.RenderRightPageToMaterial(rightPageText);
+
+            // Update the materials for the current pages in the book
+            // Assuming UpdatePageDataMaterial updates the material for a specific page in the EndlessBook
+            book.UpdatePageDataMaterial(book.CurrentLeftPageNumber, leftPageMaterial);
+            book.UpdatePageDataMaterial(book.CurrentRightPageNumber, rightPageMaterial);
+            currentLeftPageIndex += 2;
+
+        }
+
+
     }
+
+    // Add the first set of pages
+    // Get the text for the current left and right pages
 
     private void TurnPageRight()
     {
@@ -113,11 +137,19 @@ public class BookController : MonoBehaviour
         }
         else if (IsAtLastPage())
         {
-            if (charIndex >= fullBookContent.Length)
+
+            const int charsPerLine = 38; // Set the fixed number of characters per line
+            const int maxLinesPerPage = 16; // Set the maximum number of lines per page
+            const int charsPerPage = charsPerLine * maxLinesPerPage; // Calculate total characters per page
+
+            if (charIndex >= fullBookContent.Length || charIndex + charsPerPage >= fullBookContent.Length)
             {
+                Debug.Log("Last page and end of content, close book");
                 // Close the book because we reached the end of the content
                 bookCloseSound.Play();
                 book.SetState(EndlessBook.StateEnum.ClosedFront, openCloseTime, (fromState, toState, pageNumber) => OnBookStateChanged(fromState, toState, pageNumber));
+                currentLeftPageIndex = 0;
+                book.SetPageNumber(1);
             }
             else
             {
@@ -222,7 +254,8 @@ public class BookController : MonoBehaviour
         // Check if the page index is valid
         if (pageIndex < 0 || pageIndex >= pageStartIndices.Count)
         {
-            return "INVALID PAGE NUMBER GIVEN"; // Return message for invalid page indices
+            book.SetState(EndlessBook.StateEnum.ClosedFront, openCloseTime, OnBookStateChanged);
+            return "";
         }
 
         int startIndex = pageStartIndices[pageIndex];
@@ -253,7 +286,7 @@ public class BookController : MonoBehaviour
     }
 
 
-    
+
     private string GetNextPageText()
     {
         const int charsPerLine = 38; // Set the fixed number of characters per line
@@ -293,21 +326,21 @@ public class BookController : MonoBehaviour
         return pageBuilder.ToString().TrimEnd(new char[] { ' ', '\n' }); // Trim any trailing whitespace or newlines
     }
 
- 
+
 
     private string ExtractContent(EpubBook epubBook)
-{
-    // Extract text from all reading order items and concatenate
-    StringBuilder fullContent = new StringBuilder();
-    foreach (EpubLocalTextContentFile textContentFile in epubBook.ReadingOrder)
     {
-        string content = ExtractPlainText(textContentFile);
-        // Remove all newlines and extra spaces
-        string normalizedContent = Regex.Replace(content, @"\s+", " ");
-        fullContent.Append(normalizedContent);
+        // Extract text from all reading order items and concatenate
+        StringBuilder fullContent = new StringBuilder();
+        foreach (EpubLocalTextContentFile textContentFile in epubBook.ReadingOrder)
+        {
+            string content = ExtractPlainText(textContentFile);
+            // Remove all newlines and extra spaces
+            string normalizedContent = Regex.Replace(content, @"\s+", " ");
+            fullContent.Append(normalizedContent);
+        }
+        return fullContent.ToString();
     }
-    return fullContent.ToString();
-}
 
     private string ExtractPlainText(EpubLocalTextContentFile textContentFile)
     {
