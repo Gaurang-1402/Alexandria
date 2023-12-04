@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cbd9d44fa2cba8e4b96ea587d6c910ac
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212819
+  packageName: Old Vintage Library
+  packageVersion: 1.0
+  assetPath: Assets/OldLibrary/Materials/WoodDown.mat
+  uploadId: 480723

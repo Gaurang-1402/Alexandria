@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ea43301e1f504e24e99e9081e477a0b4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212819
+  packageName: Old Vintage Library
+  packageVersion: 1.0
+  assetPath: Assets/OldLibrary/Materials/Glass2.mat
+  uploadId: 480723

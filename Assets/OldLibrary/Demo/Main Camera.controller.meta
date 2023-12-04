@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6c4a55c18c6b66a499304dbd683feab4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212819
+  packageName: Old Vintage Library
+  packageVersion: 1.0
+  assetPath: Assets/OldLibrary/Demo/Main Camera.controller
+  uploadId: 480723

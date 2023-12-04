@@ -1,0 +1,6 @@
+The package contains a sceen of an old vintage library.
+There are 57 Prop(books,desks,..) - 19 Modular assets(Walls,Windows,..) 
+-Average Vertices: 2000 Vert per model.
+-Texture Size: 2048
+
+Images rendered with Unity 2020.3 Standard RP with real time lighting.

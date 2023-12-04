@@ -98,7 +98,7 @@ public class BookController : MonoBehaviour
         if (pageStartIndices.Count == 0)
         {
             // Add the first set of pages
-            AddNewPage();
+            // AddNewPage();
         }
         else
         {
@@ -162,6 +162,15 @@ public class BookController : MonoBehaviour
                 pageTurnSound.Play();
                 book.TurnToPage(book.CurrentLeftPageNumber + 2, EndlessBook.PageTurnTimeTypeEnum.TimePerPage, 0.5f);
             }
+        }
+        else
+        {
+            Debug.Log("Closing book");
+
+            bookCloseSound.Play();
+            book.SetState(EndlessBook.StateEnum.ClosedFront, openCloseTime, (fromState, toState, pageNumber) => OnBookStateChanged(fromState, toState, pageNumber));
+            currentLeftPageIndex = 0;
+            book.SetPageNumber(1);
         }
     }
 

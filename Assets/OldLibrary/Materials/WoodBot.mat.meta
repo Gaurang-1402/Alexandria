@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e4a3ab27044e5994d955b3cc1e9b2249
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212819
+  packageName: Old Vintage Library
+  packageVersion: 1.0
+  assetPath: Assets/OldLibrary/Materials/WoodBot.mat
+  uploadId: 480723

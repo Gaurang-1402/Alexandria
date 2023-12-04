@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b535c2ad158fd87419d915d1bb1686ff
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212819
+  packageName: Old Vintage Library
+  packageVersion: 1.0
+  assetPath: Assets/OldLibrary/Materials/DeskSimple_Plane.003_DeskSimpleMat.mat
+  uploadId: 480723

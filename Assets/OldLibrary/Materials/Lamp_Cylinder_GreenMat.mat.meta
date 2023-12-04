@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: aa33b96b3a2b4564e8653c7c03b8aa40
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212819
+  packageName: Old Vintage Library
+  packageVersion: 1.0
+  assetPath: Assets/OldLibrary/Materials/Lamp_Cylinder_GreenMat.mat
+  uploadId: 480723
