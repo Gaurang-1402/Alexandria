@@ -9,6 +9,8 @@ using TMPro;
 using echo17.EndlessBook; // Include the EndlessBook namespace
 using System.Text.RegularExpressions;
 using UnityEngine.XR;
+using UnityEngine.Networking;
+
 
 public class BookController : MonoBehaviour
 {
@@ -33,6 +35,15 @@ public class BookController : MonoBehaviour
     private AudioSource pageTurnSound;
     void Start()
     {
+        // Load audio clips
+        LoadAudioClips();
+
+        // Start coroutine to load EPUB file
+        StartCoroutine(LoadEpubFromStreamingAssets());
+    }
+
+    void LoadAudioClips()
+    {
         // Assuming the audio clips are located in a folder named "Sounds" within the Resources folder
         bookOpenClip = Resources.Load<AudioClip>("Sounds/BookOpen");
         bookCloseClip = Resources.Load<AudioClip>("Sounds/BookClose");
@@ -53,22 +64,65 @@ public class BookController : MonoBehaviour
         pageTurnSound.playOnAwake = false; // So it doesn't play immediately
 
 
-        // Read and parse the EPUB file
-        EpubBook epubBook = EpubReader.ReadBook(Application.dataPath + "/Books/test.epub");
-        fullBookContent = ExtractContent(epubBook);
-
     }
 
-    void Update()
+    IEnumerator LoadEpubFromStreamingAssets()
+    {
+        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "test.epub");
+        UnityWebRequest request = UnityWebRequest.Get(filePath);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            // Use the downloaded data as a byte array or convert it to a string
+            byte[] epubBytes = request.downloadHandler.data;
+
+            Debug.Log("EPUB loaded successfully");
+
+            Debug.Log("EPUB size: " + epubBytes.Length);
+
+            // Assuming you have a method that handles the byte array for the EPUB
+            HandleEpubData(epubBytes);
+        }
+        else
+        {
+            Debug.LogError("Error loading EPUB: " + request.error);
+        }
+    }
+
+    void HandleEpubData(byte[] epubData)
+    {
+        // Here you would convert the byte array to a stream and then to the EpubBook object
+        // This is pseudocode and will need to be replaced with the actual implementation
+        using (MemoryStream epubStream = new MemoryStream(epubData))
+        {
+            EpubBook epubBook = EpubReader.ReadBook(epubStream);
+            fullBookContent = ExtractContent(epubBook);
+
+            // Log the first 20 characters of the book content
+            Debug.Log("Book content: " + (fullBookContent.Length >= 20 ? fullBookContent.Substring(0, 20) : fullBookContent));
+        }
+    }
+
+
+private float inputDelay = 0.5f; // Time in seconds to wait between inputs
+private float lastInputTime = 0f; // Time when the last input was registered
+
+void Update()
+{
+    // Ensure enough time has passed since the last input
+    if (Time.time - lastInputTime > inputDelay)
     {
         // Check for keyboard input
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             HandleRightTurn();
+            lastInputTime = Time.time; // Update the last input time
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             HandleLeftTurn();
+            lastInputTime = Time.time; // Update the last input time
         }
 
         // Check for VR controller input
@@ -80,13 +134,17 @@ public class BookController : MonoBehaviour
             if (device.TryGetFeatureValue(CommonUsages.primaryButton, out bool xButtonPressed) && xButtonPressed)
             {
                 HandleRightTurn();
+                lastInputTime = Time.time; // Update the last input time
             }
             else if (device.TryGetFeatureValue(CommonUsages.secondaryButton, out bool aButtonPressed) && aButtonPressed)
             {
                 HandleLeftTurn();
+                lastInputTime = Time.time; // Update the last input time
             }
         }
     }
+}
+
 
     private void HandleRightTurn()
     {
@@ -114,12 +172,13 @@ public class BookController : MonoBehaviour
     {
         // Open the book
         book.SetState(EndlessBook.StateEnum.OpenMiddle, openCloseTime, OnBookStateChanged);
-        bookOpenSound.Play();
+        pageTurnSound.Play();
 
         // currentLeftPageIndex += 2;
 
         if (pageStartIndices.Count == 0)
         {
+
             // Add the first set of pages
             // AddNewPage();
         }
