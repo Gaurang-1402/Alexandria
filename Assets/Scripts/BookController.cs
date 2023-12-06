@@ -8,6 +8,7 @@ using System.IO;
 using TMPro;
 using echo17.EndlessBook; // Include the EndlessBook namespace
 using System.Text.RegularExpressions;
+using UnityEngine.XR;
 
 public class BookController : MonoBehaviour
 {
@@ -59,32 +60,54 @@ public class BookController : MonoBehaviour
     }
 
     void Update()
-
     {
-        // Handle right arrow key press for turning pages forward
+        // Check for keyboard input
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            Debug.Log("Turn right");
-
-            // Check if the book is closed
-            if (book.CurrentState == EndlessBook.StateEnum.ClosedFront)
-            {
-                // Open the book and add the first set of pages
-                OpenBookAndAddFirstPages();
-            }
-            else
-            {
-                // Otherwise, turn the page right
-                TurnPageRight();
-            }
+            HandleRightTurn();
         }
-
-        // Handle left arrow key press for turning pages backward
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Debug.Log("Turn left");
-            TurnPageLeft();
+            HandleLeftTurn();
         }
+
+        // Check for VR controller input
+        var inputDevices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, inputDevices);
+
+        foreach (var device in inputDevices)
+        {
+            if (device.TryGetFeatureValue(CommonUsages.primaryButton, out bool xButtonPressed) && xButtonPressed)
+            {
+                HandleRightTurn();
+            }
+            else if (device.TryGetFeatureValue(CommonUsages.secondaryButton, out bool aButtonPressed) && aButtonPressed)
+            {
+                HandleLeftTurn();
+            }
+        }
+    }
+
+    private void HandleRightTurn()
+    {
+        Debug.Log("Turn right");
+
+        // Check if the book is closed
+        if (book.CurrentState == EndlessBook.StateEnum.ClosedFront)
+        {
+            // Open the book and add the first set of pages
+            OpenBookAndAddFirstPages();
+        }
+        else
+        {
+            // Otherwise, turn the page right
+            TurnPageRight();
+        }
+    }
+    private void HandleLeftTurn()
+    {
+        Debug.Log("Turn left");
+        TurnPageLeft();
     }
 
     private void OpenBookAndAddFirstPages()
