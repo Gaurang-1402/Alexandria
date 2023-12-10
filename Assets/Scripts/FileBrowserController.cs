@@ -1,60 +1,57 @@
+using System.Collections;
 using UnityEngine;
+using SimpleFileBrowser; // Ensure you have the correct namespace
 using System.IO;
-using SFB; // Make sure the StandaloneFileBrowser namespace is included
 
 public class FileBrowserController : MonoBehaviour
 {
-    // Call this method when you want to open the file browser
-    public void OpenFileBrowserAndCopyFile()
+    // Call this function when the button is clicked
+    public void OpenFileBrowser()
     {
-        Debug.Log("Attempting to open file browser...");
-
-        var extensions = new [] {
-            new ExtensionFilter("Epub Files", "epub"),
-            new ExtensionFilter("All Files", "*" ),
-        };
-
-        // Open the file browser and store the selected path
-        string[] paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
-
-        // Check if a file was selected
-        if (paths.Length > 0)
-        {
-            string sourceFilePath = paths[0];
-            Debug.Log($"File selected: {sourceFilePath}");
-            CopyFileToStreamingAssets(sourceFilePath);
-        }
-        else
-        {
-            Debug.Log("No file selected.");
-        }
+        StartCoroutine(ShowLoadDialogCoroutine());
     }
 
-    private void CopyFileToStreamingAssets(string sourceFilePath)
+    private IEnumerator ShowLoadDialogCoroutine()
     {
-        // Extract the filename from the source file path
-        string filename = Path.GetFileName(sourceFilePath);
-        Debug.Log($"Filename extracted: {filename}");
+        Debug.Log("Opening file browser");
 
-        // Construct the destination path within the StreamingAssets folder
-        string destinationPath = Path.Combine(Application.streamingAssetsPath, filename);
-        Debug.Log($"Destination path: {destinationPath}");
+        // Set default filter (optional)
+        FileBrowser.SetDefaultFilter(".epub");
+
+        // // Show the file browser and wait for a response from the user
+        // // Only allow the selection of a single file
+        yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, null, null, "Load Epub", "Load");
+
+        // yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, null, null, "Load Epub", "Load");
+
+        // Dialog is closed
+        // Check if the user selected a file
+        if (FileBrowser.Success)
+        {
+            // Get the path of the selected file
+            string filePath = FileBrowser.Result[0];
+
+            // Copy the selected file to the StreamingAssets folder
+            CopyFileToStreamingAssets(filePath);
+        }
+        else Debug.Log("User canceled file browser");
+    }
+
+    private void CopyFileToStreamingAssets(string filePath)
+    {
+        string destinationPath = Path.Combine(Application.streamingAssetsPath, Path.GetFileName(filePath));
 
         try
         {
-            // Copy the file to the destination path
-            File.Copy(sourceFilePath, destinationPath, overwrite: true);
-            Debug.Log($"File copied to StreamingAssets: {destinationPath}");
-        }
-        catch (IOException ioEx)
-        {
-            // Handle exceptions (e.g., file not found, no permission, etc.)
-            Debug.LogError($"IOException encountered: {ioEx.Message}");
+            if (!Directory.Exists(Application.streamingAssetsPath))
+                Directory.CreateDirectory(Application.streamingAssetsPath);
+
+            File.Copy(filePath, destinationPath, true);
+            Debug.Log("File copied to StreamingAssets: " + destinationPath);
         }
         catch (System.Exception ex)
         {
-            // Handle any other exceptions
-            Debug.LogError($"General Exception encountered: {ex.Message}");
+            Debug.LogError("Error copying file: " + ex.Message);
         }
     }
 }
