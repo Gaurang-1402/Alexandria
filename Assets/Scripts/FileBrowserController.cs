@@ -5,9 +5,19 @@ using System.IO;
 
 public class FileBrowserController : MonoBehaviour
 {
+    public GameObject buttonCanvas; // Assign your button canvas here in the inspector
+    public GameObject fileBrowserCanvas; // Assign your button canvas here in the inspector
+
+    public GameObject book; // Assign your epub reader here in the inspector
     // Call this function when the button is clicked
     public void OpenFileBrowser()
     {
+        // Hide the button canvas
+        if (buttonCanvas != null)
+            buttonCanvas.SetActive(false);
+        if (fileBrowserCanvas != null)
+            fileBrowserCanvas.SetActive(true);
+
         StartCoroutine(ShowLoadDialogCoroutine());
     }
 
@@ -41,16 +51,27 @@ public class FileBrowserController : MonoBehaviour
     {
         string destinationPath = Path.Combine(Application.streamingAssetsPath, Path.GetFileName(filePath));
 
+        Debug.Log("Destination path: " + destinationPath);
         try
         {
             if (!Directory.Exists(Application.streamingAssetsPath))
                 Directory.CreateDirectory(Application.streamingAssetsPath);
 
+
+
             File.Copy(filePath, destinationPath, true);
+            if (book != null)
+            {
+                book.SetActive(true);
+            }
             Debug.Log("File copied to StreamingAssets: " + destinationPath);
         }
         catch (System.Exception ex)
         {
+            if (book != null)
+            {
+                book.SetActive(true);
+            }
             Debug.LogError("Error copying file: " + ex.Message);
         }
     }
