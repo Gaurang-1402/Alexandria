@@ -68,7 +68,7 @@ public class BookController : MonoBehaviour
 
     IEnumerator LoadEpubFromStreamingAssets()
     {
-        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "sapiens.epub");
+        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "test.epub");
         UnityWebRequest request = UnityWebRequest.Get(filePath);
         yield return request.SendWebRequest();
 
