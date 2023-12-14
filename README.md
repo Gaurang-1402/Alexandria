@@ -106,4 +106,3 @@ long-form narratives in the future.
 
 ---
 
-#### End of Document
