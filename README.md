@@ -41,3 +41,29 @@ Alexandria joins the VR trend of reimagining successful software for immersive e
 - Unity File Browser. [GitHub Repository](https://github.com/yasirkula/UnitySimpleFileBrowser)
 - VR Desktop. [Website](https://www.vrdesktop.net/)
 - Html Agility Pack. [Website](https://html-agility-pack.net/)
+
+### Figures
+#### Figure 1: A Book Being Read in Alexandria
+![A book being read in Alexandria](book.png)
+
+### Acknowledgements
+Special thanks to those who have provided feedback and support throughout the development of Alexandria. Their insights have been invaluable in shaping the project's direction and enhancing its user experience.
+
+### Author Information
+Gaurang Ruparelia is a passionate developer with a focus on VR technology. His work on Alexandria reflects his commitment to pushing the boundaries of digital reading and exploring the potential of immersive experiences.
+
+#### Contact Information
+Email: gr2159@nyu.edu
+
+### Conference Information
+Paper ID: *****
+Conference Name: CVPR
+Conference Year: 2023
+
+### Notes
+- Additional improvements and enhancements are planned for future versions of Alexandria, including cloud storage integration and expanded device compatibility.
+- The aim is to make Alexandria not just a reading tool, but a comprehensive digital library experience in VR.
+
+---
+
+#### End of Document
