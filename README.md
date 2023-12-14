@@ -19,6 +19,9 @@ Alexandria successfully integrates an ancient virtual library environment where 
 
 From the user’s perspective, the appflow is straightforward: they grant permission to access their Quest 2 files, upload a book, and then the book loads. The file upload interface is then hidden, allowing the user to start reading and move around the environment. Under the hood, the book is stored in a persistent Data folder on Android. The EPUB book parsing and text rendering occur on a render texture. This entire setup contributes to an accessible and easy-to-navigate user experience, even for beginners.
 
+![ezgif com-video-to-gif-converted](https://github.com/Gaurang-1402/Alexandria/assets/71042887/240432d4-2673-42f9-91aa-b6b012b5676c)
+
+
 ## Implementation
 The project was structured into several key phases:
 1. Development and Integration of a File Upload Interface:
