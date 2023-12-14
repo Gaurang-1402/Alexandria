@@ -1,9 +1,5 @@
 This was my final project submission for [CS-GY 9223: VIRTUAL AND AUGMENTED REALITY](https://nyu-icl.github.io/courses/2022fall-vr-ar/index.html#home).
 
-## Introduction
-The history of reading has continually evolved, from etching on stones to scrolls of papyrus, from bound paper to digital pixels. In this tradition, I present Alexandria, a project designed to be a step forward in this progression, aiming to recreate the reading experience in virtual reality (VR). The Oculus Quest 2, with its advanced features and wide adoption, serves as the perfect platform for this project. Prior to Alexandria, reading books in VR was a compromised experience, typically achieved by accessing non-native applications like Kindle through a web browser. The result was often text that appeared less sharp and engaging than what VR technology could potentially offer. Moreover, the rich immersive potential of VR suggested that a native epub reader for this environment could significantly enhance the reader’s engagement. This project was inspired by the challenge to replicate the deep, engrossing experience of reading long-form content in VR. The core objective of Alexandria has been to create a reading experience where the application recedes into the background as the user becomes absorbed in the narrative. Just as one might lose awareness of the act of turning pages in a physical book, so too should the user of Alexandria forget they are interacting with a virtual interface, becoming completely engrossed in the story.
-The foundation of this application is built upon the conviction that reading is inherently enjoyable, and it represents the initial steps toward a new evolution of reading—one where narratives captivate not just visually but through multisensory engagement, including haptic feedback, sound, and immersive environments.
-
 ## Video
 
 #### Alexandria VR Application Demo
@@ -12,6 +8,10 @@ The foundation of this application is built upon the conviction that reading is 
 Click the image or the link to watch the demonstration video of Alexandria, showcasing its features and user experience in action.
 
 Link to the video: [Alexandria VR App Demo](https://www.youtube.com/watch?v=gcQaYHthc9A&t=19s)
+
+## Introduction
+The history of reading has continually evolved, from etching on stones to scrolls of papyrus, from bound paper to digital pixels. In this tradition, I present Alexandria, a project designed to be a step forward in this progression, aiming to recreate the reading experience in virtual reality (VR). The Oculus Quest 2, with its advanced features and wide adoption, serves as the perfect platform for this project. Prior to Alexandria, reading books in VR was a compromised experience, typically achieved by accessing non-native applications like Kindle through a web browser. The result was often text that appeared less sharp and engaging than what VR technology could potentially offer. Moreover, the rich immersive potential of VR suggested that a native epub reader for this environment could significantly enhance the reader’s engagement. This project was inspired by the challenge to replicate the deep, engrossing experience of reading long-form content in VR. The core objective of Alexandria has been to create a reading experience where the application recedes into the background as the user becomes absorbed in the narrative. Just as one might lose awareness of the act of turning pages in a physical book, so too should the user of Alexandria forget they are interacting with a virtual interface, becoming completely engrossed in the story.
+The foundation of this application is built upon the conviction that reading is inherently enjoyable, and it represents the initial steps toward a new evolution of reading—one where narratives captivate not just visually but through multisensory engagement, including haptic feedback, sound, and immersive environments.
 
 
 ## Results and Demonstration
