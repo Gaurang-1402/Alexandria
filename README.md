@@ -1,9 +1,4 @@
----
-title: "Alexandria: A Virtual Reality EPUB Reader for Oculus Quest 2"
-author: "Gaurang Ruparelia"
-email: "gr2159@nyu.edu"
-year: 2023
----
+
 
 ## Abstract
 Alexandria is a Virtual Reality (VR) application developed for the Oculus Quest 2, focusing on reinventing the experience of reading digital books in EPUB format. The project aims to create a unique reading environment that extends beyond the limitations of traditional digital platforms like PCs and mobile devices. Utilizing Unity, along with the VersOne.Epub library, HTML Agility Pack, Endless Book Unity plugin, and Simple File Browser Plugin, Alexandria addresses the technical challenges of EPUB parsing, realistic book rendering, and user-friendly navigation in a VR space. The application's design philosophy revolves around enhancing the reader's engagement with digital texts, providing an immersive library setting that combines the comfort of traditional reading with the interactivity and visual appeal of VR. Alexandria represents an exploration into how VR can transform and enrich the experience of engaging with literature.
@@ -45,7 +40,7 @@ starting character on any given left or right page, and a
 pageIndex integer that increments or decrements with each
 page flip. For the book animations and materials, I utilized
 the Endless Book plugin available on Unity.
-5. Integration of All Elements into a VR Library Environment: The final step involved integrating all these
+5. Integration of All Elements into a VR Library Environment: The final step involved integrating all these
 elements into a two-floor library environment, complete with bookshelves and a desk where the user’s main book
 appears post-upload. I developed a locomotion system and
 a snap turn system, enabling users to walk around and carry
@@ -59,35 +54,37 @@ size are crucial for an optimal reading experience. Therefore, a necessary impr
 size.
 Looking ahead, there are several enhancements I plan
 to implement. One key feature is cloud storage for users’
-uploaded books and their reading progress, enabling readers to seamlessly resume their reading from where they last
+uploaded books and their reading progress, enabling readers to seamlessly resume their reading from where they last
 stopped. Another addition I aim to introduce is a virtual
 shelf where users can store and access multiple books. A
 significant future development would be the inclusion of
 image rendering within the books, which might require the
-creation of an HTML and CSS renderer. This is a substantial task, explaining its absence in the current version.
+creation of an HTML and CSS renderer. This is a sub-stantial task, explaining its absence in the current version.
 Furthermore, expanding the range of supported file formats
 and incorporating interactive features like note-taking could
 greatly enhance user experience.
-A notable limitation of Alexandria at present is its exclusive compatibility with the Oculus Quest 2. In future
+A notable limitation of Alexandria at present is its exclusive compatibility with the Oculus Quest 2. In future
 versions, I plan to broaden the range of compatible devices
 to increase accessibility for a wider user base.
 
 
 ## Conclusion
-Alexandria joins the ongoing movement in virtual reality (VR), where successful software from the mobile and PC
+Alexandria joins the ongoing movement in virtual reality (VR), where successful software from the mobile and PC
 domains are reimagined for immersive environments. This
 project showcases how VR can be harnessed to transform
-the traditional act of reading into a more engaging and interactive experience, without losing the essence of what makes
+the traditional act of reading into a more engaging and interactive experience, without losing the essence of what makes
 reading enjoyable. In using the Oculus Quest 2, Alexandria
 leverages the platform’s capabilities to improve the user’s
 reading experience, offering a blend of the familiar and the
-new. The application’s commitment to replicating the comfort of reading a physical book is evident in its choice of
+new. The application’s commitment to replicating the comfort of reading a physical book is evident in its choice of
 EPUB format, lifelike book animations, and an intuitive
-user interface. Looking forward, the introduction of features like cloud storage and broader device compatibility,
-along with other interactive elements, will undoubtedly expand the application’s appeal and functionality. Alexandria
+user interface. Looking forward, the introduction of features like cloud storage and broader device compatibility,
+along with other interactive elements, will undoubtedly expand the application’s appeal and functionality. Alexandria
 is a testament to how digital reading is evolving, with VR
 playing a significant role in shaping how we engage with
-long-form narratives in the future
+long-form narratives in the future.
+
+
 ### References
 - Kojić, Tanja, et al. "User Experience of Reading in Virtual Reality — Finding Values for Text Distance, Size and Contrast." 2020 Twelfth International Conference on Quality of Multimedia Experience (QoMEX).
 - EndlessBook. [Link](https://assetstore.unity.com/packages/3d/props/endlessbook-134213)
