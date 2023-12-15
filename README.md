@@ -5,7 +5,7 @@ This was my final project submission for [CS-GY 9223: VIRTUAL AND AUGMENTED REAL
 #### Alexandria VR Application Demo
 [![Alexandria VR Application Demo](https://github.com/Gaurang-1402/Alexandria/assets/71042887/5930b7f4-0465-48f9-a7f5-9c93dd46d8ce)](https://www.youtube.com/watch?v=gcQaYHthc9A)
 
-Click the image or the link to watch the demonstration video of Alexandria, showcasing its features and user experience in action.
+Click the image to watch the demonstration video of Alexandria.
 
 Link to the video: [Alexandria VR App Demo](https://www.youtube.com/watch?v=gcQaYHthc9A&t=19s)
 
